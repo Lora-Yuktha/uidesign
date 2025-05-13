@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-// Change these imports
-import HistorySidebar from './components/HistorySidebar/HistorySidebar';
+import React, { useState, useEffect } from 'react';
 import FileDropZone from './components/FileDropZone/FileDropZone';
 import './App.css';
 
@@ -9,7 +7,20 @@ function App() {
   const [outputText, setOutputText] = useState('');
   const [remodelOption, setRemodelOption] = useState('none');
   const [history, setHistory] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkViewport = () => {
+      const mobile = window.innerWidth <= 992;
+      setIsMobile(mobile);
+      setSidebarOpen(!mobile);
+    };
+
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+    return () => window.removeEventListener('resize', checkViewport);
+  }, []);
 
   const remodelText = (text, option) => {
     switch(option) {
@@ -39,7 +50,6 @@ function App() {
     const remodeled = remodelText(inputText, option);
     setOutputText(remodeled);
     
-    // Add to history
     if (inputText) {
       setHistory(prev => [
         {
@@ -48,7 +58,7 @@ function App() {
           remodelOption: option,
           timestamp: new Date().toISOString()
         },
-        ...prev.slice(0, 9) // Keep only last 10 items
+        ...prev.slice(0, 9)
       ]);
     }
   };
@@ -62,35 +72,59 @@ function App() {
     setInputText(item.input);
     setOutputText(item.output);
     setRemodelOption(item.remodelOption);
+    if (isMobile) setSidebarOpen(false);
   };
 
   return (
     <div className="app-container">
       <button 
-        className="sidebar-toggle"
+        className={`sidebar-toggle ${isMobile ? 'mobile' : ''}`}
         onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label={sidebarOpen ? 'Close history' : 'Open history'}
       >
-        {sidebarOpen ? '◄' : '►'}
+        {sidebarOpen ? '✕' : '☰ History'}
       </button>
       
-      {sidebarOpen && (
-        <HistorySidebar 
-          history={history} 
-          onSelectHistory={handleSelectHistory} 
-        />
-      )}
+      <div className={`history-sidebar ${sidebarOpen ? 'open' : ''} ${isMobile ? 'mobile' : ''}`}>
+        <h3>History</h3>
+        {history.length > 0 ? (
+          <ul>
+            {history.map((item, index) => (
+              <li key={index} onClick={() => handleSelectHistory(item)}>
+                <div className="history-item">
+                  <span className="history-text">
+                    {item.input.substring(0, 30)}
+                    {item.input.length > 30 ? '...' : ''}
+                  </span>
+                  <span className="history-date">
+                    {new Date(item.timestamp).toLocaleString()}
+                  </span>
+                  <span className="history-type">
+                    {item.remodelOption}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="empty-history">No history yet</p>
+        )}
+      </div>
 
-      <div className="main-content">
+      <div className={`main-content ${sidebarOpen && !isMobile ? 'with-sidebar' : ''}`}>
         <div className="panel input-panel">
           <h2>Input</h2>
           <FileDropZone onFileRead={handleFileRead} />
           <textarea
             value={inputText}
             onChange={handleInputChange}
-            placeholder="Or type your text here..."
+            placeholder="Type or drop your text here..."
           />
           <div className="controls">
-            <select value={remodelOption} onChange={handleOptionChange}>
+            <select 
+              value={remodelOption} 
+              onChange={handleOptionChange}
+            >
               <option value="none">No Remodeling</option>
               <option value="uppercase">Uppercase</option>
               <option value="lowercase">Lowercase</option>
