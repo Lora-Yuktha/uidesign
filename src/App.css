@@ -1,4 +1,4 @@
-/* Base Styles */
+/* Root Colors */
 :root {
   --black: #000000;
   --white: #ffffff;
@@ -7,6 +7,7 @@
   --light-gray: #aaaaaa;
 }
 
+/* Reset & Base */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -24,8 +25,8 @@ body {
 .app-container {
   display: flex;
   min-height: 100vh;
-  position: relative;
   overflow-x: hidden;
+  position: relative;
 }
 
 /* Sidebar Toggle Button */
@@ -39,7 +40,7 @@ body {
   border: none;
   padding: 12px 6px;
   cursor: pointer;
-  z-index: 1000;
+  z-index: 1100;
   border-radius: 0 4px 4px 0;
   transition: all 0.3s ease;
   font-size: 1rem;
@@ -64,7 +65,7 @@ body {
   background-color: var(--dark-gray);
   padding: 20px;
   overflow-y: auto;
-  z-index: 100;
+  z-index: 1000;
   border-right: 1px solid var(--medium-gray);
   transition: transform 0.3s ease;
 }
@@ -153,7 +154,6 @@ body {
   border: 1px solid var(--medium-gray);
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 
 .panel h2 {
@@ -161,7 +161,7 @@ body {
   font-size: 1.3rem;
 }
 
-/* Text Input */
+/* Text Area */
 textarea {
   width: 100%;
   flex-grow: 1;
@@ -226,7 +226,7 @@ button:disabled {
 }
 
 .clear-btn:hover {
-  background-color: #444444;
+  background-color: #444;
 }
 
 /* Output Display */
@@ -256,34 +256,47 @@ button:disabled {
   min-width: 150px;
 }
 
-/* Responsive Design */
+/* Responsive Adjustments */
 @media (max-width: 992px) {
   .main-content {
     flex-direction: column;
     margin-left: 0;
-    padding: 20px 15px 15px;
+    padding: 60px 15px 15px;
   }
 
   .history-sidebar {
-    transform: translateX(-100%);
     width: 280px;
+    transform: translateX(-100%);
+    z-index: 1000;
   }
 
   .history-sidebar.open {
     transform: translateX(0);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
   }
 
   .sidebar-toggle {
     left: 15px;
     top: 15px;
     transform: none;
-    z-index: 1100;
     padding: 10px;
     border-radius: 4px;
   }
 
-  .sidebar-toggle.collapsed {
-    left: 15px;
+  .input-panel {
+    position: relative;
+    z-index: 100;
+  }
+
+  .history-sidebar.open + .main-content::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
   }
 }
 
@@ -299,77 +312,9 @@ button:disabled {
   textarea {
     padding: 12px;
     font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .main-content {
-    padding: 15px 10px;
-    gap: 15px;
+    margin-top: 40px;
   }
 
-  .history-sidebar {
-    width: 85vw;
-  }
-
-  .output-controls button {
-    width: 100%;
-  }
-}
-/* App.css - Updated Responsive Behavior */
-
-/* ... (keep all previous styles) ... */
-
-@media (max-width: 992px) {
-  .main-content {
-    flex-direction: column;
-    margin-left: 0;
-    padding: 60px 15px 15px; /* Added top padding for toggle button */
-  }
-
-  .history-sidebar {
-    transform: translateX(-100%);
-    width: 280px;
-    z-index: 1000; /* Ensure sidebar appears above content */
-  }
-
-  .history-sidebar.open {
-    transform: translateX(0);
-    box-shadow: 2px 0 10px rgba(0,0,0,0.5); /* Add shadow when open */
-  }
-
-  .sidebar-toggle {
-    position: fixed;
-    left: 15px;
-    top: 15px;
-    transform: none;
-    z-index: 1100; /* Higher than sidebar */
-    padding: 10px;
-    border-radius: 4px;
-    background: var(--white);
-    color: var(--black);
-  }
-
-  /* Position input panel relatively for z-index control */
-  .input-panel {
-    position: relative;
-    z-index: 100;
-  }
-
-  /* When sidebar is open, darken main content */
-  .history-sidebar.open + .main-content::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-  }
-}
-
-@media (max-width: 480px) {
   .sidebar-toggle {
     top: 10px;
     left: 10px;
@@ -380,60 +325,7 @@ button:disabled {
     width: 85vw;
   }
 
-  /* Ensure textarea doesn't overlap with toggle */
-  textarea {
-    margin-top: 40px;
+  .output-controls button {
+    width: 100%;
   }
-}
-/* Mobile Sidebar Styles */
-.history-sidebar.mobile {
-  position: fixed;
-  top: 0;
-  left: -100%;
-  width: 80%;
-  max-width: 300px;
-  height: 100vh;
-  transition: left 0.3s ease;
-  z-index: 1000;
-  background-color: #111;
-}
-
-.history-sidebar.mobile.open {
-  left: 0;
-}
-
-.sidebar-toggle.mobile {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 1100;
-  background: white;
-  color: black;
-  padding: 8px 12px;
-  border-radius: 4px;
-}
-
-/* Overlay when sidebar is open */
-.history-sidebar.mobile.open + .main-content::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 999;
-}
-
-/* Hide main content when sidebar is open on mobile */
-.history-sidebar.mobile.open ~ .main-content {
-  transform: translateX(80%);
-  overflow: hidden;
-}
-.main-content.collapsed {
-  margin-left: 0;
-}
-
-.sidebar-toggle.collapsed {
-  left: 0;
 }

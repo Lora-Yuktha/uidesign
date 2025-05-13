@@ -1,22 +1,25 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import './HistorySidebar.css';
 
-const HistorySidebar = ({
-  history,
-  onSelectHistory,
-  onClose,       // <-- function to close sidebar
-}) => {
+const HistorySidebar = ({ history, onSelectHistory, onClose }) => {
+  const sidebarRef = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        onClose(); // Close if clicked outside
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
+
   return (
-    <div className="history-sidebar">
+    <div className="history-sidebar" ref={sidebarRef}>
       <div className="history-header">
         <h3>History</h3>
-        <button
-          onClick={onClose}
-          className="close-button"
-          title="Close Sidebar"
-        >
-          &times;
-        </button>
+        {/* Removed close button */}
       </div>
 
       <ul className="history-list">
